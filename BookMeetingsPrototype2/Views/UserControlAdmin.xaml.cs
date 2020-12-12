@@ -1,5 +1,7 @@
-﻿using System;
+﻿using BookMeetingsPrototype2.ViewModels.ModelClasses;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -206,6 +208,8 @@ namespace BookMeetingsPrototype2.Views
             }
         }
 
+        //upon saving button click determins which category is in and then saves
+        //the entered data either as a new record or updates the existing data
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             //get the combo box value to choose which table to delete the selected row from
@@ -334,6 +338,70 @@ namespace BookMeetingsPrototype2.Views
                 }
             }
 
+        }
+
+        //Upon button click query the database for the past six months worth of records (*In this case all of them since everytime app starts up delete old records)
+        //and export the data into a csv file that is placed in the same directory as this program
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            //get every single record and store it as a meeting object
+            var records = (from booking in db.TayMarkBooking_Emps
+                           join meeting in db.TayMarkBookings on booking.meetingId equals meeting.meetingId
+                           join room in db.TayMarkRooms on meeting.meetingRoomId equals room.roomId
+                           select new Meeting { MeetingId = meeting.meetingId, MeetingTitle = meeting.meetingTitle, RoomName = room.roomName, MeetingDuration = meeting.meetingDuration, MeetingStart = meeting.meetingStart, MeetingEnd = (DateTime)meeting.meetingEnd }).OrderBy(x => x.MeetingStart);
+
+            //setup the csv file
+            var csv = new StringBuilder();
+
+            //loop through every record and place the relevant data inside the csv file
+            foreach (var meeting in records)
+            {
+                //query the db for all the participants in the relevant meeting
+                //get the participants that are in the meeting
+                var meetingParticipants = (from booking in db.TayMarkBooking_Emps
+                                           join emps in db.TayMarkEmployees on booking.employeeId equals emps.empId
+                                           where meeting.MeetingId == booking.meetingId
+                                           select emps);
+
+                //make a string list of every participant in that meeting
+                string meetingEmps = "";
+                foreach (var emp in meetingParticipants)
+                {
+                    string temp = ""; //make a placeholder string
+                    temp = emp.name + ": " + emp.empId + "\n,,,,,,";
+
+                    meetingEmps += temp; //add the formated employee to the string of all employees in the meeting
+                }
+
+                //****
+                //Append all meeting information together to placed into the csv
+                var meetingId = meeting.MeetingId;
+                var title = meeting.MeetingTitle;
+                var room = meeting.RoomName;
+                var start = meeting.MeetingStart;
+                var end = meeting.MeetingEnd;
+                var duration = meeting.MeetingDuration;
+                var participants = meetingEmps;
+
+                var newLine = string.Format("{0},{1},{2},{3},{4},{5},{6}", meetingId, title, room, start, end, duration, participants);
+                
+                //add the line to the csv stringbuilder
+                csv.AppendLine(newLine);
+            }
+
+            //write text to csv file
+            try
+            {
+                File.WriteAllText("Meetings_Past_6_Months.csv", csv.ToString());
+                MessageBox.Show("Data exported to same directory as program location.");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Data export failed. Error: " + ex);
+                throw;
+            }
+            
+            
         }
     }
 

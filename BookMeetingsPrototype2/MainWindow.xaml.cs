@@ -27,29 +27,38 @@ namespace BookMeetingsPrototype2
         //set up connection object
         TayMarkDataDataContext db = new TayMarkDataDataContext(Properties.Settings.Default.sql1803534ConnectionString);
 
-        public MainWindow() //add parameter later for user login****
+        public MainWindow(string name, int id) //add parameter later for user login****
         {
+
+            UserSetup(name, id); //set up the logged in user
             InitializeComponent();
-            startingView();
-            User();
+            startingView(); //set the starting view to be the HOME view/viewmodel
             
         }
 
 
         //sets up the user ID 
-        private Participant User()
+        private void UserSetup(string name, int id)
         {
             //*** remove later but this will set the user as first user in database
             //var userInfo = (from emps in db.TayMarkEmployees
             //              select emps);
 
-            var userInfo = db.TayMarkEmployees.OrderBy(emp => emp.empId).Skip(1).Take(1).FirstOrDefault();
+            //var userInfo = db.TayMarkEmployees.OrderBy(emp => emp.empId).Skip(1).Take(1).FirstOrDefault();
 
-            Participant _user = new Participant() { EmpId = userInfo.empId, Name = userInfo.name};
+            Participant loggedin = new Participant() { EmpId = id, Name = name};
 
-            return _user;
+            User = loggedin;
         }
 
+        private Participant _user;
+        private Participant User
+        {
+            get { return _user; }
+            set { _user = value; }
+        }
+
+        //set the starting view to be the HOME view/viewmodel
         private void startingView()
         {
             //set the display name
@@ -59,21 +68,24 @@ namespace BookMeetingsPrototype2
             UserControl usc = new UserControlHome();
             GridMain.Children.Add(usc);
             //set the starting data context to the home view
-            this.DataContext = new HomeModel(User());
+            this.DataContext = new HomeModel(User);
         }
 
+        //when the sidebar menu button is opened
         private void ButtonOpenMenu_Click(object sender, RoutedEventArgs e)
         {
             ButtonCloseMenu.Visibility = Visibility.Visible;
             ButtonOpenMenu.Visibility = Visibility.Collapsed;
         }
 
+        //when the sidebar menu button is closed
         private void ButtonCloseMenu_Click(object sender, RoutedEventArgs e)
         {
             ButtonCloseMenu.Visibility = Visibility.Collapsed;
             ButtonOpenMenu.Visibility = Visibility.Visible;
         }
 
+        //when the logout button is clicked
         private void ButtonPopUpLogout_Click(object sender, RoutedEventArgs e)
         {
             Application.Current.Shutdown();
@@ -81,38 +93,27 @@ namespace BookMeetingsPrototype2
 
         private void ListViewMenu_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //update name of the account 
-            //query the db for the name associate with the account
-            //var acc = (from ac in db.Accounts
-            //           where ac.account_id == accountId
-            //           select ac).Single();
-
-            //update the display name
-            //displayName.Text = acc.name;
 
             //create the user control object to be used for changing the views
             UserControl usc = null;
             GridMain.Children.Clear();
-
-
-            //DataContext = new UserHomeModel();
 
             switch (((ListViewItem)((ListView)sender).SelectedItem).Name)
             {
                 case "ItemHome":
                     usc = new UserControlHome();
                     GridMain.Children.Add(usc);
-                    DataContext = new HomeModel(User()); //send the user data to home model to be used
+                    DataContext = new HomeModel(User); //send the user data to home model to be used
                     break;
                 case "ItemNotify":
                     usc = new UserControlNotify();
                     GridMain.Children.Add(usc);
-                    DataContext = new NotifyModel(User()); //send the user data to notify model to be used
+                    DataContext = new NotifyModel(User); //send the user data to notify model to be used
                     break;
                 case "ItemBook":
                     usc = new UserControlBooking();
                     GridMain.Children.Add(usc);
-                    DataContext = new BookingModel(User()); //send the user data to booking model to be used
+                    DataContext = new BookingModel(User); //send the user data to booking model to be used
                     break;
                 default:
 
@@ -124,7 +125,7 @@ namespace BookMeetingsPrototype2
         {
             //query the db if the logged in user is a verified admin
             var adminCheck = (from admin in db.TayMarkAdmins
-                              where admin.empId == User().EmpId
+                              where admin.empId == User.EmpId
                               select admin);
 
             //check that the user is a verified admin
@@ -138,7 +139,7 @@ namespace BookMeetingsPrototype2
                     //MessageBox.Show("You said: " + dialog.Password);
                     UserControl usc = new UserControlAdmin();
                     GridMain.Children.Add(usc);
-                    DataContext = new AdminModel(User());
+                    DataContext = new AdminModel(User);
                 }
             }
             else

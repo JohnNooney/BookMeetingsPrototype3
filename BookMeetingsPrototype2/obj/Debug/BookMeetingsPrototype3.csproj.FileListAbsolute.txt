@@ -59,3 +59,5 @@ C:\Users\John\Desktop\bookmeetings_3_repo\BookMeetingsPrototype3\BookMeetingsPro
 C:\Users\John\Desktop\bookmeetings_3_repo\BookMeetingsPrototype3\BookMeetingsPrototype2\obj\Debug\BookMeetingsPrototype3.csproj.CopyComplete
 C:\Users\John\Desktop\bookmeetings_3_repo\BookMeetingsPrototype3\BookMeetingsPrototype2\obj\Debug\BookMeetingsPrototype2.exe
 C:\Users\John\Desktop\bookmeetings_3_repo\BookMeetingsPrototype3\BookMeetingsPrototype2\obj\Debug\BookMeetingsPrototype2.pdb
+C:\Users\John\Desktop\bookmeetings_3_repo\BookMeetingsPrototype3\BookMeetingsPrototype2\obj\Debug\UserLogin.g.cs
+C:\Users\John\Desktop\bookmeetings_3_repo\BookMeetingsPrototype3\BookMeetingsPrototype2\obj\Debug\UserLogin.baml

@@ -8,7 +8,7 @@
         xmlns:views="clr-namespace:BookMeetingsPrototype2.Views"
         xmlns:local="clr-namespace:BookMeetingsPrototype2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1080" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
+        Title="TayMark Meetings" Height="600" Width="1080" ResizeMode="NoResize" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <Storyboard x:Key="OpenMenu">
             <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="(FrameworkElement.Width)" Storyboard.TargetName="GridMenu">

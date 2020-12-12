@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 C:\Users\John\Desktop\bookmeetings_3_repo\BookMeetingsPrototype3\BookMeetingsPrototype2\App.xaml
-6-1305737940
+71619822108
 
-22-1075373116
+23153424759
 1331496131875
-MainWindow.xaml;Views\DialogBox\AdminDialog.xaml;Views\UserControlAdmin.xaml;Views\UserControlBooking.xaml;Views\UserControlHome.xaml;Views\UserControlNotify.xaml;
+MainWindow.xaml;UserLogin.xaml;Views\DialogBox\AdminDialog.xaml;Views\UserControlAdmin.xaml;Views\UserControlBooking.xaml;Views\UserControlHome.xaml;Views\UserControlNotify.xaml;
 
 False
 

@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -25,7 +26,7 @@ namespace BookMeetingsPrototype2.ViewModels
         }
         public NotifyModel(Participant loggedUser)
         {
-            //Test data
+            //load harcoded test data
             //testNotifications();
             
 
@@ -34,6 +35,9 @@ namespace BookMeetingsPrototype2.ViewModels
 
             //load DB associated data
             meetingData();
+
+            //perfom tests on meeting created in the booking menu
+            //testBookingData();
         }
 
         public Participant User
@@ -42,6 +46,7 @@ namespace BookMeetingsPrototype2.ViewModels
             set { _user = value; }
         }
 
+        //test that hardcoded data can work before adding data via database connection
         public void testNotifications()
         {
             ObservableCollection<Participant> Participants = new ObservableCollection<Participant>()
@@ -59,6 +64,29 @@ namespace BookMeetingsPrototype2.ViewModels
                 Meeting x = new Meeting { MeetingTitle = ("Meeting" + i), RoomName = "Far Far Away", MeetingStart = DateTime.Now, MeetingDuration = "10 min.", MeetingLeader = Participants[0].Name, MeetingParticipants = Participants };
                 Meetings.Add(x);
             }
+        }
+
+        //Integration Test
+        //compare the test data that was submitted in the booking menu to make sure it matches correctly
+        public void testBookingData()
+        {
+            //test meeting title
+            Debug.Assert(Meetings[0].MeetingTitle == "TestMeeting", "Meeting title does not match.");
+            //room name
+            Debug.Assert(Meetings[0].RoomName == "Far Far Away", "Meeting room does not match.");
+            //meeting start
+            Debug.Assert(Meetings[0].MeetingStart == new DateTime(2020, 12, 12, 17, 30, 0), "Meeting time does not match.");
+            //meeting duration
+            Debug.Assert(Meetings[0].MeetingDuration == "10 min.", "Meeting duration does not match.");
+            //meeting leader
+            Debug.Assert(Meetings[0].MeetingLeader == "Elsa Duncan", "Meeting team leader does not match.");
+            //meeting participants
+            Debug.Assert(Meetings[0].MeetingParticipants[0].Name == "Elsa Duncan");
+            Debug.Assert(Meetings[0].MeetingParticipants[1].Name == "Sandy Grant");
+            Debug.Assert(Meetings[0].MeetingParticipants[2].Name == "Allan Johnstone");
+            Debug.Assert(Meetings[0].MeetingParticipants[3].Name == "Chloe Walker");
+
+            MessageBox.Show("All Tests Pass. Data Matches.");
         }
 
         //selects the meetings that the logged in user is included in for the day

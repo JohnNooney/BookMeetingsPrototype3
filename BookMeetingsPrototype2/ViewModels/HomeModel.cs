@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,7 +30,10 @@ namespace BookMeetingsPrototype2.ViewModels
             //load Data 
             loadDBData();
 
-            
+            //******
+            //Black Box Testing
+            //******
+            //testBookingData();
         }
 
         public void loadDBData()
@@ -63,6 +67,20 @@ namespace BookMeetingsPrototype2.ViewModels
                 MessageBox.Show(e.ToString());
                 throw;
             }
+        }
+
+        //Integration Test
+        //Tests that the test meeting in the booking menu was retrieved correctly
+        public void testBookingData()
+        {
+            //test meeting title
+            Debug.Assert(Agenda[0].MeetingTitle == "TestMeeting", "Meeting title does not match.");
+            //room name
+            Debug.Assert(Agenda[0].MeetingRoom == "Far Far Away", "Meeting room does not match.");
+            //meeting start
+            Debug.Assert(Agenda[0].MeetingStart == new DateTime(2020, 12, 12, 17, 30, 0), "Meeting time does not match.");
+
+            MessageBox.Show("All Tests Pass. Data Matches.");
         }
 
         public Participant User

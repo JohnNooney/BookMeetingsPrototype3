@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO.Packaging;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -104,9 +105,11 @@ namespace BookMeetingsPrototype2.ViewModels
             //dynamically update capacity message when the capacity has changed
             SParticipants.CollectionChanged += CapacityChanged;
 
-            //CapacityFeedback = SParticipants.Count;
-            //load some test selected data
-            //testSelectedData();
+            //*****
+            //Black Box Testing
+            //*****
+            //autoSelectData();
+            //falseDataTest();
         }
 
         //function that retrives data from the database
@@ -143,19 +146,57 @@ namespace BookMeetingsPrototype2.ViewModels
 
         }
 
-        //function to test selected data with
-        private void testSelectedData()
+        //function for automating the testing of making a booking confirmation
+        private void autoSelectData()
         {
+            //write a room title
+            MeetingTitle = "TestMeeting";
             //select a room
             SRoom = Rooms.First(); //first room on the list
             //select a Duration
             SDuration = Durations.ElementAt(1); //selects second element: 10 min
             //select a Time
-            SelectedDateTime = new DateTime(2020,10,11,11,35,00);
+            SelectedDateTime = new DateTime(2020,12,12,17,30,00);
             //add selected participants
             SParticipants.Add(Participants.ElementAt(0));
             SParticipants.Add(Participants.ElementAt(1));
             SParticipants.Add(Participants.ElementAt(2));
+
+            //submit test data for test booking
+            VerifyButtonClick();
+            
+        }
+
+        //funtion to test data that should not pass the booking confirmation
+        private void falseDataTest()
+        {
+            //Test when room is already booked at that time
+            Debug.Assert(!verifyRoomTime(), "Room should not be booked.");
+
+            //test when booking time is out of bounds
+            //min
+            SelectedDateTime = new DateTime(2020, 12, 12, 02, 30, 00);
+            Debug.Assert(!bookedTimeTest(), "Selected time should be out of min bounds");
+            //max
+            SelectedDateTime = new DateTime(2020, 12, 12, 20, 30, 00);
+            Debug.Assert(bookedTimeTest(), "Selected time should be out of max bounds"); //should pass because does not allow setting time beyond 18:00
+
+            //test when too many participants are booked for the room's capacity
+            SParticipants.Add(Participants.ElementAt(3));
+            SParticipants.Add(Participants.ElementAt(4));
+
+            Debug.Assert(capacityTest(), "Participant selection should be exceeded");
+
+            //test when no data is entered
+            ClearAllButtonClick(); //used to clear all fields instantly
+            //title
+            Debug.Assert(MeetingTitle == null, "Meeting title should be empty");
+
+            //if selected participants is greater than 2 (team leader will always selected)
+            Debug.Assert(SParticipants.Count > 2, "Meeting title should be empty");
+
+            //duration
+            Debug.Assert(SDuration == null, "Meeting duration should be empty");
         }
 
         //function to populate the information with test data
@@ -396,14 +437,6 @@ namespace BookMeetingsPrototype2.ViewModels
             {
                 MessageBox.Show("Please fill all boxes before submitting.");
             }
-            else if (RealDateTime > SelectedDateTime) //if the selected datetime is 
-            {
-                MessageBox.Show("Can't book a meeting in the past. Please choose the current time or later.");
-            }
-            else if (RealDateTime > maxTime) //if the selected datetime is 
-            {
-                MessageBox.Show("Working hours are over, wait until tomorrow to book.");
-            }
             else if (SParticipants.Count < 2)
             {
                 MessageBox.Show("Meeting must have more than 1 Participant.");
@@ -413,7 +446,7 @@ namespace BookMeetingsPrototype2.ViewModels
             {
                 MessageBox.Show("Participant selection exceeds Room Capacity.");
             }
-            else
+            else if(bookedTimeTest() && capacityTest()) //if the time selected pass and capacity isn't exceeded
             {
                 if (verifyBusyEmployees()) //if there are no employees selected that are booked then proceed
                 {
@@ -441,6 +474,37 @@ namespace BookMeetingsPrototype2.ViewModels
             }
 
 
+        }
+
+        private bool bookedTimeTest()
+        {
+            if (RealDateTime > SelectedDateTime) //if the selected datetime is 
+            {
+                MessageBox.Show("Can't book a meeting in the past. Please choose the current time or later.");
+                return false;
+            }
+            else if (RealDateTime > maxTime) //if the selected datetime is 
+            {
+                MessageBox.Show("Working hours are over, wait until tomorrow to book.");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+
+        private bool capacityTest()
+        {
+            if (SParticipants.Count > SRoom.Capacity)
+            {
+                MessageBox.Show("Participant selection exceeds Room Capacity.");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
         }
 
         /// <summary>
@@ -536,7 +600,7 @@ namespace BookMeetingsPrototype2.ViewModels
             return flag;
         }
 
-        //****test if any of the users involved in the meeting are in another meeting at that time********
+        //test if room is already booked at the time selected
         private bool verifyRoomTime()
         {
             bool bookingClash = true;

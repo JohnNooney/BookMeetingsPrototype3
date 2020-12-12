@@ -42,9 +42,9 @@ namespace BookMeetingsPrototype2
             }
         }
 
+        //compare employee records ID num to the entered one
         private void BtnSubmit_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show(int.Parse(UserId).ToString());
             //create db query to look for entered id match
             var user = (from s in db.TayMarkEmployees
                         where s.empId == int.Parse(UserId)
@@ -52,9 +52,9 @@ namespace BookMeetingsPrototype2
             //where the email matches, check to see if password follows
             if (user.Any())
             {
-                //hide this window and send user to main store 
-                this.Hide();
+                //close this window and send user to main store 
                 MainWindow app = new MainWindow(user.First().name, user.First().empId);
+                this.Close();
                 app.Show();
             }
             //produce message if ID does not exist
